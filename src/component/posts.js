@@ -24,34 +24,54 @@ class Posts extends Component {
       5.delete => useer,post,cmnt,group,page esob delete kora jabe
        */
   }
+  handleCreate = async () => {
+    try {
+      const post = { title: "Ponsit", body: "I love pondit" };
+      const { data } = await axios.post(
+        "https://jsonplaceholder.typicode.com/posts",
+        post
+      );
+      const posts = [data, ...this.state.posts];
+      this.setState({ posts });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   render() {
     return (
-      <table className="table container">
-        <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Title</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.state.posts.map((post) => {
-            return (
+      <>
+        <div className="container text-center">
+          <button className="btn btn-primary" onClick={this.handleCreate}>
+            Add
+          </button>
+          <table className="table container">
+            <thead>
               <tr>
-                <th scope="row">{post.id}</th>
-                <td>{post.title}</td>
-                <td>
-                  <button className="btn btn-primary">Update</button>
-                </td>
-                <td>
-                  <button className="btn btn-danger">Delete</button>
-                </td>
+                <th scope="col">ID</th>
+                <th scope="col">Title</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {this.state.posts.map((post) => {
+                return (
+                  <tr key={post.id}>
+                    <th scope="row">{post.id}</th>
+                    <td>{post.title}</td>
+                    <td>
+                      <button className="btn btn-primary">Update</button>
+                    </td>
+                    <td>
+                      <button className="btn btn-danger">Delete</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </>
     );
   }
 }
