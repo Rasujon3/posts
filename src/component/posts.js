@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { Component } from "react";
+const apiUrl = "https://jsonplaceholder.typicode.com/posts";
 
 class Posts extends Component {
   state = {
@@ -9,9 +10,7 @@ class Posts extends Component {
   async componentDidMount() {
     // const promise = axios.get("https://jsonplaceholder.typicode.com/posts");
     try {
-      const { data: posts } = await axios.get(
-        "https://jsonplaceholder.typicode.com/posts"
-      );
+      const { data: posts } = await axios.get(apiUrl);
       this.setState({ posts });
     } catch (error) {
       console.log(error);
@@ -27,11 +26,23 @@ class Posts extends Component {
   handleCreate = async () => {
     try {
       const post = { title: "Ponsit", body: "I love pondit" };
-      const { data } = await axios.post(
-        "https://jsonplaceholder.typicode.com/posts",
-        post
-      );
+      const { data } = await axios.post(apiUrl, post);
       const posts = [data, ...this.state.posts];
+      this.setState({ posts });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  handleUpdate = async (postId) => {
+    try {
+      const post = { id: postId, title: "updated the title" };
+      const { data } = await axios.put(`${apiUrl}/${postId}`, post);
+      const posts = [...this.state.posts];
+      posts.forEach((post) => {
+        if (post.id == postId) {
+          post.title = data.title;
+        }
+      });
       this.setState({ posts });
     } catch (error) {
       console.log(error);
@@ -60,7 +71,12 @@ class Posts extends Component {
                     <th scope="row">{post.id}</th>
                     <td>{post.title}</td>
                     <td>
-                      <button className="btn btn-primary">Update</button>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => this.handleUpdate(post.id)}
+                      >
+                        Update
+                      </button>
                     </td>
                     <td>
                       <button className="btn btn-danger">Delete</button>
