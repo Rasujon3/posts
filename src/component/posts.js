@@ -35,7 +35,7 @@ class Posts extends Component {
   };
   handleUpdate = async (postId) => {
     try {
-      const post = { id: postId, title: "updated the title" };
+      const post = { title: "updated the title" };
       const { data } = await axios.put(`${apiUrl}/${postId}`, post);
       const posts = [...this.state.posts];
       posts.forEach((post) => {
@@ -44,6 +44,16 @@ class Posts extends Component {
         }
       });
       this.setState({ posts });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  handleDelete = async (postId) => {
+    try {
+      await axios.delete(`${apiUrl}/${postId}`);
+      const posts = [...this.state.posts];
+      const updatedPosts = posts.filter((post) => post.id !== postId);
+      this.setState({ posts: updatedPosts });
     } catch (error) {
       console.log(error);
     }
@@ -79,7 +89,12 @@ class Posts extends Component {
                       </button>
                     </td>
                     <td>
-                      <button className="btn btn-danger">Delete</button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => this.handleDelete(post.id)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
