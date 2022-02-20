@@ -1,6 +1,24 @@
 import axios from "axios";
+import { Toast } from "bootstrap";
 import React, { Component } from "react";
 const apiUrl = "https://jsonplaceholder.typicode.com/posts";
+
+axios.interceptors.response.use(null, (error) => {
+  const expectedError =
+    error.response &&
+    error.response.status >= 400 &&
+    error.response.status < 500;
+  if (!expectedError) {
+    console.log("Logged the error", error);
+    alert("An unexpected error occured. Please try again later. ");
+  } else if (error.response.status === 400) {
+    alert("Bad request");
+  } else if (error.response.status === 404) {
+    alert("This post is not found or previously deleted");
+  }
+  // console.log(error.response);
+  return Promise.reject(error);
+});
 
 class Posts extends Component {
   state = {
@@ -50,12 +68,16 @@ class Posts extends Component {
   };
   handleDelete = async (postId) => {
     try {
-      await axios.delete(`${apiUrl}/${postId}`);
+      await axios.delete(`dfdfdf${apiUrl}/${postId}/ur`);
       const posts = [...this.state.posts];
       const updatedPosts = posts.filter((post) => post.id !== postId);
       this.setState({ posts: updatedPosts });
     } catch (error) {
-      console.log(error);
+      /* 
+        Error 2 types er
+        1.expected errors or client errors (400 – bad request,404 – not found)
+        2. Unexpected errors (network off,server down, server bug, )
+      */
     }
   };
   render() {
