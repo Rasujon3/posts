@@ -1,24 +1,10 @@
-import axios from "axios";
-import { Toast } from "bootstrap";
 import React, { Component } from "react";
-const apiUrl = "https://jsonplaceholder.typicode.com/posts";
-
-axios.interceptors.response.use(null, (error) => {
-  const expectedError =
-    error.response &&
-    error.response.status >= 400 &&
-    error.response.status < 500;
-  if (!expectedError) {
-    console.log("Logged the error", error);
-    alert("An unexpected error occured. Please try again later. ");
-  } else if (error.response.status === 400) {
-    alert("Bad request");
-  } else if (error.response.status === 404) {
-    alert("This post is not found or previously deleted");
-  }
-  // console.log(error.response);
-  return Promise.reject(error);
-});
+import {
+  getPosts,
+  createPosts,
+  updatePost,
+  deletePost,
+} from "../service/postService";
 
 class Posts extends Component {
   state = {
@@ -26,59 +12,31 @@ class Posts extends Component {
   };
 
   async componentDidMount() {
-    // const promise = axios.get("https://jsonplaceholder.typicode.com/posts");
-    try {
-      const { data: posts } = await axios.get(apiUrl);
-      this.setState({ posts });
-    } catch (error) {
-      console.log(error);
-    }
-    /* Request
-      1.get => server theke data niye ase
-      2.post => server e kono kichu create kore, ex: user,post,cmnt create kore
-      3.put => user,post cmnt update kora jebe,total update e put r partial update e patch
-      4.patch => total update e put r partial update e patch
-      5.delete => useer,post,cmnt,group,page esob delete kora jabe
-       */
+    const { data: posts } = await getPosts();
+    this.setState({ posts });
   }
   handleCreate = async () => {
-    try {
-      const post = { title: "Ponsit", body: "I love pondit" };
-      const { data } = await axios.post(apiUrl, post);
-      const posts = [data, ...this.state.posts];
-      this.setState({ posts });
-    } catch (error) {
-      console.log(error);
-    }
+    const post = { title: "Ponsit", body: "I love pondit" };
+    const { data } = await createPosts(post);
+    const posts = [data, ...this.state.posts];
+    this.setState({ posts });
   };
   handleUpdate = async (postId) => {
-    try {
-      const post = { title: "updated the title" };
-      const { data } = await axios.put(`${apiUrl}/${postId}`, post);
-      const posts = [...this.state.posts];
-      posts.forEach((post) => {
-        if (post.id == postId) {
-          post.title = data.title;
-        }
-      });
-      this.setState({ posts });
-    } catch (error) {
-      console.log(error);
-    }
+    const post = { title: "updated the title" };
+    const { data } = await updatePost(postId, post);
+    const posts = [...this.state.posts];
+    posts.forEach((post) => {
+      if (post.id == postId) {
+        post.title = data.title;
+      }
+    });
+    this.setState({ posts });
   };
   handleDelete = async (postId) => {
-    try {
-      await axios.delete(`dfdfdf${apiUrl}/${postId}/ur`);
-      const posts = [...this.state.posts];
-      const updatedPosts = posts.filter((post) => post.id !== postId);
-      this.setState({ posts: updatedPosts });
-    } catch (error) {
-      /* 
-        Error 2 types er
-        1.expected errors or client errors (400 – bad request,404 – not found)
-        2. Unexpected errors (network off,server down, server bug, )
-      */
-    }
+    await deletePost(postId);
+    const posts = [...this.state.posts];
+    const updatedPosts = posts.filter((post) => post.id !== postId);
+    this.setState({ posts: updatedPosts });
   };
   render() {
     return (
